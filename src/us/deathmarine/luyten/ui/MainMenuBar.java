@@ -26,7 +26,7 @@ public class MainMenuBar extends JMenuBar {
     private static final long serialVersionUID = -7949855817172562075L;
     private final MainWindow mainWindow;
     private final Map<String, Language> languageLookup = new HashMap<>();
-    
+
     private JMenu recentFiles;
     private JMenuItem clearRecentFiles;
     private JCheckBoxMenuItem flattenSwitchBlocks;
@@ -51,13 +51,13 @@ public class MainMenuBar extends JMenuBar {
     private JCheckBoxMenuItem exitByEscEnabled;
     private final DecompilerSettings settings;
     private LuytenPreferences luytenPrefs;
-    
+
     public MainMenuBar(MainWindow mainWnd) {
         this.mainWindow = mainWnd;
         final ConfigSaver configSaver = ConfigSaver.getLoadedInstance();
         settings = configSaver.getDecompilerSettings();
         luytenPrefs = configSaver.getLuytenPreferences();
-        
+
         final JMenu fileMenu = new JMenu("File");
         fileMenu.add(new JMenuItem("..."));
         this.add(fileMenu);
@@ -79,7 +79,7 @@ public class MainMenuBar extends JMenuBar {
         final JMenu helpMenu = new JMenu("Help");
         helpMenu.add(new JMenuItem("..."));
         this.add(helpMenu);
-        
+
         // start quicker
         new Thread() {
             public void run() {
@@ -87,31 +87,31 @@ public class MainMenuBar extends JMenuBar {
                     // build menu later
                     buildFileMenu(fileMenu);
                     refreshMenuPopup(fileMenu);
-                    
+
                     buildEditMenu(editMenu);
                     refreshMenuPopup(editMenu);
-                    
+
                     buildThemesMenu(themesMenu);
                     refreshMenuPopup(themesMenu);
-                    
+
                     buildDecompilersMenu(decompilersMenu);
                     refreshMenuPopup(decompilersMenu);
-                    
+
                     buildOperationMenu(operationMenu);
                     refreshMenuPopup(operationMenu);
-                    
+
                     buildSettingsMenu(settingsMenu, configSaver);
                     refreshMenuPopup(settingsMenu);
-                    
+
                     buildHelpMenu(helpMenu);
                     refreshMenuPopup(helpMenu);
-                    
+
                     updateRecentFiles();
                 } catch (Exception e) {
                     Luyten.showExceptionDialog("Exception!", e);
                 }
             }
-            
+
             // refresh currently opened menu
             // (if user selected a menu before it was ready)
             private void refreshMenuPopup(JMenu menu) {
@@ -126,7 +126,7 @@ public class MainMenuBar extends JMenuBar {
             }
         }.start();
     }
-    
+
     public void updateRecentFiles() {
         if (RecentFiles.paths.isEmpty()) {
             recentFiles.setEnabled(false);
@@ -136,28 +136,28 @@ public class MainMenuBar extends JMenuBar {
             recentFiles.setEnabled(true);
             clearRecentFiles.setEnabled(true);
         }
-        
+
         recentFiles.removeAll();
         ListIterator<String> li = RecentFiles.paths.listIterator(RecentFiles.paths.size());
         boolean rfSaveNeeded = false;
-        
+
         while (li.hasPrevious()) {
             String path = li.previous();
             final File file = new File(path);
-            
+
             if (!file.exists()) {
                 rfSaveNeeded = true;
                 continue;
             }
-            
+
             JMenuItem menuItem = new JMenuItem(path);
             menuItem.addActionListener(e -> mainWindow.loadNewFile(file));
             recentFiles.add(menuItem);
         }
-        
+
         if (rfSaveNeeded) RecentFiles.save();
     }
-    
+
     @SuppressWarnings("deprecation")
     private void buildFileMenu(final JMenu fileMenu) {
         fileMenu.removeAll();
@@ -167,13 +167,13 @@ public class MainMenuBar extends JMenuBar {
         menuItem.addActionListener(e -> mainWindow.onOpenFileMenu());
         fileMenu.add(menuItem);
         fileMenu.addSeparator();
-        
+
         menuItem = new JMenuItem("Close File");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_W, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.addActionListener(e -> {
             JTabbedPane house = mainWindow.getSelectedModel().house;
-            
+
             if (e.getModifiers() != InputEvent.CTRL_MASK || house.getTabCount() == 0)
                 mainWindow.onCloseFileMenu();
             else {
@@ -182,23 +182,23 @@ public class MainMenuBar extends JMenuBar {
         });
         fileMenu.add(menuItem);
         fileMenu.addSeparator();
-        
+
         menuItem = new JMenuItem("Save As...");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.addActionListener(e -> mainWindow.onSaveAsMenu());
         fileMenu.add(menuItem);
-        
+
         menuItem = new JMenuItem("Save All...");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.addActionListener(e -> mainWindow.onSaveAllMenu());
         fileMenu.add(menuItem);
         fileMenu.addSeparator();
-        
+
         recentFiles = new JMenu("Recent Files");
         fileMenu.add(recentFiles);
-        
+
         clearRecentFiles = new JMenuItem("Clear Recent Files");
         clearRecentFiles.addActionListener(e -> {
             RecentFiles.paths.clear();
@@ -206,9 +206,9 @@ public class MainMenuBar extends JMenuBar {
             updateRecentFiles();
         });
         fileMenu.add(clearRecentFiles);
-        
+
         fileMenu.addSeparator();
-        
+
         // Only add the exit command for non-OS X. OS X handles its close
         // automatically
         if (!Boolean.getBoolean("apple.laf.useScreenMenuBar")) {
@@ -218,7 +218,7 @@ public class MainMenuBar extends JMenuBar {
             fileMenu.add(menuItem);
         }
     }
-    
+
     @SuppressWarnings("deprecation")
     private void buildEditMenu(JMenu editMenu) {
         editMenu.removeAll();
@@ -227,34 +227,34 @@ public class MainMenuBar extends JMenuBar {
             KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setEnabled(false);
         editMenu.add(menuItem);
-        
+
         menuItem = new JMenuItem("Copy");
         menuItem.addActionListener(new DefaultEditorKit.CopyAction());
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         editMenu.add(menuItem);
-        
+
         menuItem = new JMenuItem("Paste");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.setEnabled(false);
         editMenu.add(menuItem);
-        
+
         editMenu.addSeparator();
-        
+
         menuItem = new JMenuItem("Select All");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.addActionListener(e -> mainWindow.onSelectAllMenu());
         editMenu.add(menuItem);
         editMenu.addSeparator();
-        
+
         menuItem = new JMenuItem("Find...");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.addActionListener(e -> mainWindow.onFindMenu());
         editMenu.add(menuItem);
-        
+
         menuItem = new JMenuItem("Find Next");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
@@ -262,7 +262,7 @@ public class MainMenuBar extends JMenuBar {
             if (mainWindow.findBox != null) mainWindow.findBox.fireExploreAction(true);
         });
         editMenu.add(menuItem);
-        
+
         menuItem = new JMenuItem("Find Previous");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_F3, InputEvent.SHIFT_DOWN_MASK));
@@ -270,14 +270,14 @@ public class MainMenuBar extends JMenuBar {
             if (mainWindow.findBox != null) mainWindow.findBox.fireExploreAction(false);
         });
         editMenu.add(menuItem);
-        
+
         menuItem = new JMenuItem("Find All");
         menuItem.setAccelerator(
             KeyStroke.getKeyStroke(KeyEvent.VK_G, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         menuItem.addActionListener(e -> mainWindow.onFindAllMenu());
         editMenu.add(menuItem);
     }
-    
+
     private void buildThemesMenu(JMenu themesMenu) {
         themesMenu.removeAll();
         themesGroup = new ButtonGroup();
@@ -285,38 +285,38 @@ public class MainMenuBar extends JMenuBar {
         a.setSelected("default.xml".equals(luytenPrefs.getThemeXml()));
         themesGroup.add(a);
         themesMenu.add(a);
-        
+
         a = new JRadioButtonMenuItem(new ThemeAction("Default-Alt", "default-alt.xml"));
         a.setSelected("default-alt.xml".equals(luytenPrefs.getThemeXml()));
         themesGroup.add(a);
         themesMenu.add(a);
-        
+
         a = new JRadioButtonMenuItem(new ThemeAction("Dark", "dark.xml"));
         a.setSelected("dark.xml".equals(luytenPrefs.getThemeXml()));
         themesGroup.add(a);
         themesMenu.add(a);
-        
+
         a = new JRadioButtonMenuItem(new ThemeAction("Eclipse", "eclipse.xml"));
         a.setSelected("eclipse.xml".equals(luytenPrefs.getThemeXml()));
         themesGroup.add(a);
         themesMenu.add(a);
-        
+
         a = new JRadioButtonMenuItem(new ThemeAction("Visual Studio", "vs.xml"));
         a.setSelected("vs.xml".equals(luytenPrefs.getThemeXml()));
         themesGroup.add(a);
         themesMenu.add(a);
-        
+
         a = new JRadioButtonMenuItem(new ThemeAction("IntelliJ", "idea.xml"));
         a.setSelected("idea.xml".equals(luytenPrefs.getThemeXml()));
         themesGroup.add(a);
         themesMenu.add(a);
-        
+
         a = new JRadioButtonMenuItem(new ThemeAction("One Dark", "onedark.xml"));
         a.setSelected("onedark.xml".equals(luytenPrefs.getThemeXml()));
         themesGroup.add(a);
         themesMenu.add(a);
     }
-    
+
     private void buildDecompilersMenu(JMenu decompilersMenu) {
         decompilersMenu.removeAll();
         decompilersGroup = new ButtonGroup();
@@ -327,7 +327,7 @@ public class MainMenuBar extends JMenuBar {
             decompilersMenu.add(mi);
         });
     }
-    
+
     private void buildOperationMenu(JMenu operationMenu) {
         operationMenu.removeAll();
         packageExplorerStyle = new JCheckBoxMenuItem("Package Explorer Style");
@@ -337,7 +337,7 @@ public class MainMenuBar extends JMenuBar {
             mainWindow.onTreeSettingsChanged();
         });
         operationMenu.add(packageExplorerStyle);
-        
+
         filterOutInnerClassEntries = new JCheckBoxMenuItem("Filter Out Inner Class Entries");
         filterOutInnerClassEntries.setSelected(luytenPrefs.isFilterOutInnerClassEntries());
         filterOutInnerClassEntries.addActionListener(e -> {
@@ -345,18 +345,18 @@ public class MainMenuBar extends JMenuBar {
             mainWindow.onTreeSettingsChanged();
         });
         operationMenu.add(filterOutInnerClassEntries);
-        
+
         singleClickOpenEnabled = new JCheckBoxMenuItem("Single Click Open");
         singleClickOpenEnabled.setSelected(luytenPrefs.isSingleClickOpenEnabled());
         singleClickOpenEnabled.addActionListener(e -> luytenPrefs.setSingleClickOpenEnabled(singleClickOpenEnabled.isSelected()));
         operationMenu.add(singleClickOpenEnabled);
-        
+
         exitByEscEnabled = new JCheckBoxMenuItem("Exit By Esc");
         exitByEscEnabled.setSelected(luytenPrefs.isExitByEscEnabled());
         exitByEscEnabled.addActionListener(e -> luytenPrefs.setExitByEscEnabled(exitByEscEnabled.isSelected()));
         operationMenu.add(exitByEscEnabled);
     }
-    
+
     private void buildSettingsMenu(JMenu settingsMenu, ConfigSaver configSaver) {
         settingsMenu.removeAll();
         ActionListener settingsChanged = e -> new Thread(() -> {
@@ -367,55 +367,55 @@ public class MainMenuBar extends JMenuBar {
         flattenSwitchBlocks.setSelected(settings.getFlattenSwitchBlocks());
         flattenSwitchBlocks.addActionListener(settingsChanged);
         settingsMenu.add(flattenSwitchBlocks);
-        
+
         forceExplicitImports = new JCheckBoxMenuItem("Force Explicit Imports");
         forceExplicitImports.setSelected(settings.getForceExplicitImports());
         forceExplicitImports.addActionListener(settingsChanged);
         settingsMenu.add(forceExplicitImports);
-        
+
         forceExplicitTypes = new JCheckBoxMenuItem("Force Explicit Types");
         forceExplicitTypes.setSelected(settings.getForceExplicitTypeArguments());
         forceExplicitTypes.addActionListener(settingsChanged);
         settingsMenu.add(forceExplicitTypes);
-        
+
         showSyntheticMembers = new JCheckBoxMenuItem("Show Synthetic Members");
         showSyntheticMembers.setSelected(settings.getShowSyntheticMembers());
         showSyntheticMembers.addActionListener(settingsChanged);
         settingsMenu.add(showSyntheticMembers);
-        
+
         excludeNestedTypes = new JCheckBoxMenuItem("Exclude Nested Types");
         excludeNestedTypes.setSelected(settings.getExcludeNestedTypes());
         excludeNestedTypes.addActionListener(settingsChanged);
         settingsMenu.add(excludeNestedTypes);
-        
+
         retainRedundantCasts = new JCheckBoxMenuItem("Retain Redundant Casts");
         retainRedundantCasts.setSelected(settings.getRetainRedundantCasts());
         retainRedundantCasts.addActionListener(settingsChanged);
         settingsMenu.add(retainRedundantCasts);
-        
+
         unicodeReplacement = new JCheckBoxMenuItem("Enable Unicode Replacement");
         unicodeReplacement.setSelected(settings.isUnicodeOutputEnabled());
         unicodeReplacement.addActionListener(settingsChanged);
         settingsMenu.add(unicodeReplacement);
-        
+
         debugLineNumbers = new JCheckBoxMenuItem("Show Debug Line Numbers");
         debugLineNumbers.setSelected(settings.getShowDebugLineNumbers());
         debugLineNumbers.addActionListener(settingsChanged);
         settingsMenu.add(debugLineNumbers);
-        
+
         JMenu debugSettingsMenu = new JMenu("Debug Settings");
         showDebugInfo = new JCheckBoxMenuItem("Include Error Diagnostics");
         showDebugInfo.setSelected(settings.getIncludeErrorDiagnostics());
         showDebugInfo.addActionListener(settingsChanged);
-        
+
         debugSettingsMenu.add(showDebugInfo);
         settingsMenu.add(debugSettingsMenu);
         settingsMenu.addSeparator();
-        
+
         languageLookup.put(Languages.java().getName(), Languages.java());
         languageLookup.put(Languages.bytecode().getName(), Languages.bytecode());
         languageLookup.put(Languages.bytecodeAst().getName(), Languages.bytecodeAst());
-        
+
         languagesGroup = new ButtonGroup();
         java = new JRadioButtonMenuItem(Languages.java().getName());
         java.getModel().setActionCommand(Languages.java().getName());
@@ -432,7 +432,7 @@ public class MainMenuBar extends JMenuBar {
         bytecodeAST.setSelected(Languages.bytecodeAst().getName().equals(settings.getLanguage().getName()));
         languagesGroup.add(bytecodeAST);
         settingsMenu.add(bytecodeAST);
-        
+
         JMenu debugLanguagesMenu = new JMenu("Debug Languages");
         for (final Language language : Languages.debug()) {
             final JRadioButtonMenuItem m = new JRadioButtonMenuItem(language.getName());
@@ -446,13 +446,13 @@ public class MainMenuBar extends JMenuBar {
             button.addActionListener(settingsChanged);
         }
         settingsMenu.add(debugLanguagesMenu);
-        
+
         bytecodeLineNumbers = new JCheckBoxMenuItem("Show Line Numbers In Bytecode");
         bytecodeLineNumbers.setSelected(settings.getIncludeLineNumbersInBytecode());
         bytecodeLineNumbers.addActionListener(settingsChanged);
         settingsMenu.add(bytecodeLineNumbers);
     }
-    
+
     private void buildHelpMenu(JMenu helpMenu) {
         helpMenu.removeAll();
         JMenuItem menuItem = new JMenuItem("Legal");
@@ -483,7 +483,7 @@ public class MainMenuBar extends JMenuBar {
             pane.add(new JLabel("FisheyLP, and Syquel"));
             pane.add(new JLabel(" "));
             pane.add(new JLabel("Powered By:"));
-            
+
             String procyon = "https://github.com/mstrobel/procyon";
             link = new JLabel("<html><font color=\"#03bafc\"><u>" + procyon + "</u></font></html>");
             link.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -491,7 +491,7 @@ public class MainMenuBar extends JMenuBar {
             pane.add(link);
             pane.add(new JLabel("Version: " + Procyon.version()));
             pane.add(new JLabel("(c) 2018 Mike Strobel"));
-            
+
             String cfr = "https://github.com/leibnitz27/cfr";
             link = new JLabel("<html><font color=\"#03bafc\"><u>" + cfr + "</u></font></html>");
             link.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -499,7 +499,7 @@ public class MainMenuBar extends JMenuBar {
             pane.add(link);
             pane.add(new JLabel("Version: " + CfrVersionInfo.VERSION_INFO));
             pane.add(new JLabel("(c) 2011-2019 Lee Benfield"));
-            
+
             String vineflower = "https://github.com/Vineflower/vineflower";
             link = new JLabel("<html><font color=\"#03bafc\"><u>" + vineflower + "</u></font></html>");
             link.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -507,7 +507,7 @@ public class MainMenuBar extends JMenuBar {
             pane.add(link);
             pane.add(new JLabel("Version: 1.9.1"));
             pane.add(new JLabel("(c) 2023 Vineflower Contributors"));
-            
+
             String kotlinp = "https://github.com/JetBrains/kotlin/tree/master/libraries/tools/kotlinp";
             link = new JLabel("<html><font color=\"#03bafc\"><u>" + kotlinp + "</u></font></html>");
             link.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -515,7 +515,7 @@ public class MainMenuBar extends JMenuBar {
             pane.add(link);
             pane.add(new JLabel("Version: 1.9.1"));
             pane.add(new JLabel("(c) 2010-2023 JetBrains s.r.o. and Kotlin Programming Language contributors"));
-            
+
             String rsyntax = "https://github.com/bobbylight/RSyntaxTextArea";
             link = new JLabel("<html><font color=\"#03bafc\"><u>" + rsyntax + "</u></font></html>");
             link.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -523,7 +523,7 @@ public class MainMenuBar extends JMenuBar {
             pane.add(link);
             pane.add(new JLabel("Version: 3.3.0"));
             pane.add(new JLabel("(c) 2021 Robert Futrell"));
-            
+
             String darkLaf = "https://github.com/weisJ/darklaf/";
             link = new JLabel("<html><font color=\"#03bafc\"><u>" + darkLaf + "</u></font></html>");
             link.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -536,7 +536,7 @@ public class MainMenuBar extends JMenuBar {
         });
         helpMenu.add(menuItem);
     }
-    
+
     private void populateSettingsFromSettingsMenu() {
         // synchronized: do not disturb decompiler at work (synchronize every
         // time before run decompiler)
@@ -558,15 +558,15 @@ public class MainMenuBar extends JMenuBar {
             //
             // settings.setAlwaysGenerateExceptionVariableForCatchBlocks(true);
             //
-            
+
             final ButtonModel selectedLanguage = languagesGroup.getSelection();
             if (selectedLanguage != null) {
                 final Language language = languageLookup.get(selectedLanguage.getActionCommand());
-                
+
                 if (language != null)
                     settings.setLanguage(language);
             }
-            
+
             if (java.isSelected()) {
                 settings.setLanguage(Languages.java());
             } else if (bytecode.isSelected()) {
@@ -577,48 +577,50 @@ public class MainMenuBar extends JMenuBar {
             settings.setIncludeLineNumbersInBytecode(bytecodeLineNumbers.isSelected());
         }
     }
-    
+
     private class ThemeAction extends AbstractAction {
         private static final long serialVersionUID = -6618680171943723199L;
         private String xml;
-        
+
         public ThemeAction(String name, String xml) {
             putValue(NAME, name);
             this.xml = xml;
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             luytenPrefs.setThemeXml(xml);
             mainWindow.onThemesChanged();
         }
     }
-    
+
     private class DecompilerAction extends AbstractAction {
         private static final long serialVersionUID = 5241351687025589732L;
-        
+
         private Decompiler decompiler;
-        
+
         public DecompilerAction(String name, Decompiler decompiler) {
             putValue(NAME, name);
             this.decompiler = decompiler;
         }
-        
+
         @Override
         public void actionPerformed(ActionEvent e) {
             luytenPrefs.setDecompiler(decompiler);
+            populateSettingsFromSettingsMenu();
+            mainWindow.onSettingsChanged();
         }
     }
-    
+
     private static class LinkListener extends MouseAdapter {
         String link;
         JLabel label;
-        
+
         public LinkListener(String link, JLabel label) {
             this.link = link;
             this.label = label;
         }
-        
+
         @Override
         public void mouseClicked(MouseEvent e) {
             try {
@@ -627,16 +629,16 @@ public class MainMenuBar extends JMenuBar {
                 e1.printStackTrace();
             }
         }
-        
+
         @Override
         public void mouseEntered(MouseEvent e) {
             label.setText("<html><font color=\"#0078a3\"><u>" + link + "</u></font></html>");
         }
-        
+
         @Override
         public void mouseExited(MouseEvent e) {
             label.setText("<html><font color=\"#03bafc\"><u>" + link + "</u></font></html>");
         }
-        
+
     }
 }

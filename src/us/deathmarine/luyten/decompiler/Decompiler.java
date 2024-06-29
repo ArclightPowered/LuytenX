@@ -7,6 +7,8 @@ public enum Decompiler {
     PROCYON("Procyon", ProcyonLinkProvider::new),
     CFR("CFR", CFRLinkProvider::new),
     Vineflower("Vineflower", VineflowerLinkProvider::new),
+    ASMTEXT("ASM Text", ASMTextProvider::new),
+    ASMIFIER("ASMifier", ASMifierProvider::new),
     KOTLINP("Kotlinp", KotlinpLinkProvider::new);
     
     public static final Decompiler[] VALUES = values();
